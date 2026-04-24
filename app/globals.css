@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Scheherazade+New:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @source "../app/**/*.{ts,tsx}";
@@ -22,7 +22,11 @@ body {
   font-family: 'Amiri', 'Traditional Arabic', serif;
 }
 
-/* Scheherazade New — full Quranic Unicode support (diacritics, verse markers, sajda signs) */
+/* Quranic text font stack:
+   1. Noto Naskh Arabic — covers ALL Unicode Arabic blocks including Extended-A
+      (U+08A0–U+08FF: ruku marks, sajda signs, pause marks, manzil, etc.)
+   2. Scheherazade New — beautiful Quranic calligraphy style fallback
+   3. System Arabic fallback */
 .font-quran {
-  font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+  font-family: 'Noto Naskh Arabic', 'Scheherazade New', 'Traditional Arabic', 'Arabic Typesetting', serif;
 }
