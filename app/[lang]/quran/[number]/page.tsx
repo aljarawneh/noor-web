@@ -6,11 +6,10 @@ import { type Lang, t, toLang } from "@/lib/translations";
 // Revalidate every 30 days — ISR, not full static pre-render
 export const revalidate = 2592000;
 
-// Only pre-render the most popular surahs at build time to avoid rate limits
+// Pre-render all 114 surahs for both languages (static export)
 export async function generateStaticParams() {
-  const popular = [1, 2, 36, 55, 67, 112, 113, 114];
   const params: { lang: string; number: string }[] = [];
-  for (const n of popular) {
+  for (let n = 1; n <= 114; n++) {
     params.push({ lang: "en", number: String(n) });
     params.push({ lang: "ar", number: String(n) });
   }
