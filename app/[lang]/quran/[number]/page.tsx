@@ -117,7 +117,7 @@ export default async function SurahPage({
       <div className={`mb-6 ${isAr ? "text-right" : ""}`}>
         <Link
           href={`/${lang}/quran`}
-          className={`inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-green-700 transition-colors ${isAr ? "flex-row-reverse" : ""}`}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-green-700 transition-colors"
         >
           {isAr ? <ChevronRight size={15}/> : <ChevronLeft size={15}/>}
           {t(lang, "quran.back")}
@@ -140,9 +140,11 @@ export default async function SurahPage({
         </div>
         <h1 className="text-5xl font-quran mb-2 leading-loose">{arabic.name}</h1>
         <p className="text-xl font-bold text-green-100">
-          {arabic.number}. {arabic.englishName}
+          {arabic.number}. {isAr ? arabic.name : arabic.englishName}
         </p>
-        <p className="text-green-200 text-sm mt-1 italic">{arabic.englishNameTranslation}</p>
+        {!isAr && (
+          <p className="text-green-200 text-sm mt-1 italic">{arabic.englishNameTranslation}</p>
+        )}
 
         {arabic.number !== 9 && (
           <p className="mt-6 text-2xl font-quran text-yellow-200 leading-loose">
