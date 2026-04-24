@@ -1,9 +1,9 @@
 "use client";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import {
   Play, Pause, SkipForward, SkipBack,
   ChevronLeft, ChevronRight, AlignLeft, BookOpen,
-  Headphones, X, Loader2,
+  Headphones, X,
 } from "lucide-react";
 import { type Lang } from "@/lib/translations";
 
@@ -44,8 +44,25 @@ function audioUrl(qari: string, surah: number, ayah: number) {
   return `https://everyayah.com/data/${qari}/${String(surah).padStart(3,"0")}${String(ayah).padStart(3,"0")}.mp3`;
 }
 
-function pageImg(page: number) {
-  return `https://cdn.islamic.network/quran/images/high-resolution/${page}.png`;
+// ── Ayah end marker (Unicode End of Ayah character) rendered as ornament
+function AyahMarker({ n }: { n: number }) {
+  return (
+    <span
+      className="inline-flex items-center justify-center mx-1 font-arabic shrink-0"
+      style={{
+        background: "linear-gradient(135deg,#C8A951,#8B6914)",
+        color: "white",
+        borderRadius: "50%",
+        width: "1.6em",
+        height: "1.6em",
+        fontSize: "0.65em",
+        verticalAlign: "middle",
+        fontWeight: "bold",
+      }}
+    >
+      {n}
+    </span>
+  );
 }
 
 export default function SurahReader({ arabic, translation, lang }: Props) {
@@ -63,13 +80,19 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
   const playingRef = useRef<number | null>(null);
   useEffect(() => { playingRef.current = playingAyah; }, [playingAyah]);
 
-  // ── Mushaf ──
-  const mushafPages = [...new Set(
-    arabic.ayahs.map(a => a.page).filter((p): p is number => typeof p === "number")
-  )].sort((a, b) => a - b);
+  // ── Mushaf pages — group surah ayahs by page number ──
+  const pageGroups = useMemo(() => {
+    const map = new Map<number, Ayah[]>();
+    for (const ayah of arabic.ayahs) {
+      const p = ayah.page ?? 1;
+      if (!map.has(p)) map.set(p, []);
+      map.get(p)!.push(ayah);
+    }
+    return [...map.entries()].sort(([a], [b]) => a - b); // [[pageNum, ayahs[]], ...]
+  }, [arabic.ayahs]);
+
   const [pageIdx, setPageIdx] = useState(0);
-  const [imgLoading, setImgLoading] = useState(true);
-  const [imgError, setImgError] = useState(false);
+  const [currentPageNum, currentAyahs] = pageGroups[pageIdx] ?? [1, arabic.ayahs];
 
   const play = useCallback((n: number) => {
     if (!audioRef.current) return;
@@ -82,12 +105,8 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
 
   const handleEnded = useCallback(() => {
     const cur = playingRef.current;
-    if (cur !== null && cur < arabic.numberOfAyahs) {
-      play(cur + 1);
-    } else {
-      setPlaying(false);
-      setPlayingAyah(null);
-    }
+    if (cur !== null && cur < arabic.numberOfAyahs) play(cur + 1);
+    else { setPlaying(false); setPlayingAyah(null); }
   }, [arabic.numberOfAyahs, play]);
 
   // Switch qari while playing
@@ -98,15 +117,12 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-    if (playing) {
-      audioRef.current.pause();
-    } else {
-      if (playingAyah === null) play(1);
-      else audioRef.current.play().catch(() => {});
-    }
+    if (playing) audioRef.current.pause();
+    else if (playingAyah === null) play(1);
+    else audioRef.current.play().catch(() => {});
   };
 
-  const currentPage = mushafPages[pageIdx] ?? 1;
+  const isFirstPage = pageGroups[0]?.[0] === currentPageNum;
 
   return (
     <div className="pb-28">
@@ -133,11 +149,11 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
 
       {/* ══════════ MUSHAF VIEW ══════════ */}
       {mode === "mushaf" && (
-        <div className="flex flex-col items-center gap-4">
-          {/* Nav bar */}
+        <div className="flex flex-col items-center gap-5">
+          {/* Page nav */}
           <div className={`flex w-full items-center justify-between ${isAr ? "flex-row-reverse" : ""}`}>
             <button
-              onClick={() => { setPageIdx(i => Math.max(0, i-1)); setImgLoading(true); setImgError(false); }}
+              onClick={() => setPageIdx(i => Math.max(0, i - 1))}
               disabled={pageIdx === 0}
               className={`flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-gray-50 transition ${isAr ? "flex-row-reverse" : ""}`}
             >
@@ -145,11 +161,11 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
               {isAr ? "السابقة" : "Prev"}
             </button>
             <span className="text-sm font-bold text-gray-700">
-              {isAr ? `صفحة ${currentPage} من 604` : `Page ${currentPage} / 604`}
+              {isAr ? `صفحة ${currentPageNum} من 604` : `Page ${currentPageNum} / 604`}
             </span>
             <button
-              onClick={() => { setPageIdx(i => Math.min(mushafPages.length-1, i+1)); setImgLoading(true); setImgError(false); }}
-              disabled={pageIdx >= mushafPages.length - 1}
+              onClick={() => setPageIdx(i => Math.min(pageGroups.length - 1, i + 1))}
+              disabled={pageIdx >= pageGroups.length - 1}
               className={`flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600 disabled:opacity-30 hover:bg-gray-50 transition ${isAr ? "flex-row-reverse" : ""}`}
             >
               {isAr ? "التالية" : "Next"}
@@ -157,56 +173,98 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
             </button>
           </div>
 
-          {/* Page image — golden Mushaf frame */}
+          {/* Mushaf page — text-based rendering */}
           <div
-            className="relative w-full max-w-2xl rounded-2xl overflow-hidden"
+            className="w-full max-w-2xl relative"
             style={{
-              background: "#FDF8F0",
-              border: "6px solid #C8A951",
-              boxShadow: "0 0 0 2px #8B6914, 0 24px 60px rgba(0,0,0,0.28)",
+              border: "8px solid #C8A951",
+              borderRadius: "18px",
+              boxShadow: "0 0 0 3px #8B6914, inset 0 0 30px rgba(200,169,81,0.08), 0 24px 60px rgba(0,0,0,0.22)",
+              background: "#FEFAF3",
             }}
           >
-            {imgLoading && !imgError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-amber-50 z-10 min-h-64">
-                <Loader2 className="animate-spin text-yellow-700" size={36}/>
-              </div>
-            )}
-            {imgError ? (
-              <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
-                <BookOpen size={48} className="text-amber-300 mb-4"/>
-                <p className="text-amber-800 font-semibold mb-1">
-                  {isAr ? "تعذّر تحميل الصفحة" : "Page unavailable"}
-                </p>
-                <p className="text-amber-600 text-sm">
-                  {isAr ? "تحقق من اتصالك بالإنترنت" : "Check your internet connection"}
-                </p>
-              </div>
-            ) : (
-              <img
-                key={currentPage}
-                src={pageImg(currentPage)}
-                alt={`Quran page ${currentPage}`}
-                className="w-full h-auto"
-                style={{ display: imgLoading ? "none" : "block" }}
-                onLoad={() => { setImgLoading(false); setImgError(false); }}
-                onError={() => { setImgLoading(false); setImgError(true); }}
+            {/* Corner ornaments */}
+            {["top-1 left-1","top-1 right-1","bottom-1 left-1","bottom-1 right-1"].map(pos => (
+              <div
+                key={pos}
+                className={`absolute ${pos} w-5 h-5 rounded-full`}
+                style={{ background: "radial-gradient(circle,#D4AF37,#8B6914)" }}
               />
-            )}
+            ))}
+
+            {/* Inner frame */}
+            <div
+              className="m-3 rounded-xl p-6 sm:p-8"
+              style={{ border: "1.5px solid rgba(200,169,81,0.4)", minHeight: "500px" }}
+            >
+              {/* Surah name header (only on first page of surah) */}
+              {isFirstPage && (
+                <div className="text-center mb-5">
+                  <div
+                    className="inline-block px-8 py-2 rounded-full mb-2"
+                    style={{ background: "linear-gradient(90deg,#1B5E20,#2E7D32)", color: "white" }}
+                  >
+                    <p className="font-quran text-2xl leading-loose">{arabic.name}</p>
+                  </div>
+                  <p className="text-xs text-amber-700 font-semibold tracking-widest uppercase">
+                    {arabic.englishName} · {arabic.numberOfAyahs} {isAr ? "آية" : "verses"}
+                  </p>
+                </div>
+              )}
+
+              {/* Bismillah (not for At-Tawbah and not on continuation pages) */}
+              {isFirstPage && arabic.number !== 9 && (
+                <p
+                  className="font-quran text-center text-2xl leading-loose mb-6"
+                  style={{ color: "#1B3A1F" }}
+                  dir="rtl"
+                >
+                  بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
+                </p>
+              )}
+
+              {/* Page number top-right */}
+              <div className={`flex justify-between text-xs text-amber-700 font-bold mb-4 ${isAr ? "flex-row-reverse" : ""}`}>
+                <span className="font-arabic">{arabic.name}</span>
+                <span>{currentPageNum}</span>
+              </div>
+
+              {/* Ayah text — continuous flow like real Mushaf */}
+              <p
+                className="font-quran text-[1.45rem] sm:text-[1.65rem] leading-[2.6] text-right"
+                dir="rtl"
+                style={{ color: "#1a1a1a", textAlign: "justify", textAlignLast: "right" }}
+              >
+                {currentAyahs.map(ayah => (
+                  <span key={ayah.number}>
+                    {ayah.text}
+                    <AyahMarker n={ayah.numberInSurah}/>
+                  </span>
+                ))}
+              </p>
+
+              {/* Juz indicator */}
+              <div className="mt-4 text-center">
+                <span className="text-xs text-amber-600 font-arabic font-semibold">
+                  {isAr ? `الجزء — صفحة ${currentPageNum}` : `Page ${currentPageNum} · Juz displayed`}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Page dots */}
-          {mushafPages.length <= 20 && (
+          {pageGroups.length <= 20 && (
             <div className="flex gap-1.5 flex-wrap justify-center">
-              {mushafPages.map((p, i) => (
+              {pageGroups.map(([pNum], i) => (
                 <button
-                  key={p}
-                  onClick={() => { setPageIdx(i); setImgLoading(true); setImgError(false); }}
+                  key={pNum}
+                  onClick={() => setPageIdx(i)}
                   className={`w-8 h-8 rounded-full text-xs font-bold transition-all ${
                     i === pageIdx ? "text-white shadow" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                   }`}
                   style={i === pageIdx ? { background: "#1B5E20" } : {}}
                 >
-                  {p}
+                  {pNum}
                 </button>
               ))}
             </div>
@@ -227,7 +285,6 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                   active ? "border-green-400 shadow-green-100 shadow-lg" : "border-gray-100"
                 }`}
               >
-                {/* Row: number + play */}
                 <div className={`flex items-center justify-between mb-4 ${isAr ? "flex-row-reverse" : ""}`}>
                   <div className={`flex items-center gap-2 ${isAr ? "flex-row-reverse" : ""}`}>
                     <span
@@ -260,20 +317,16 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                   </button>
                 </div>
 
-                {/* Arabic text */}
                 <p className="font-quran text-3xl text-gray-900 leading-[2.4] mb-5 text-right" dir="rtl">
                   {ayah.text}
                 </p>
 
-                {/* Translation */}
                 {trans && (
                   <div className={`border-t border-gray-100 pt-4 ${isAr ? "text-right" : ""}`}>
                     <p className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">
                       {isAr ? "الترجمة" : "Translation"}
                     </p>
-                    <p className="text-gray-700 text-sm leading-relaxed" dir="ltr">
-                      {trans.text}
-                    </p>
+                    <p className="text-gray-700 text-sm leading-relaxed" dir="ltr">{trans.text}</p>
                   </div>
                 )}
               </div>
@@ -298,7 +351,6 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
       >
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className={`flex items-center gap-3 ${isAr ? "flex-row-reverse" : ""}`}>
-
             {/* Qari selector */}
             <div className="relative shrink-0">
               <button
@@ -313,16 +365,11 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                   )?.split(" ")[0]}
                 </span>
               </button>
-
               {showQariMenu && (
                 <div className={`absolute bottom-full mb-2 z-50 bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden w-60 ${isAr ? "right-0" : "left-0"}`}>
                   <div className={`flex items-center justify-between px-4 py-3 border-b border-gray-100 ${isAr ? "flex-row-reverse" : ""}`}>
-                    <p className="text-xs font-bold text-gray-700">
-                      {isAr ? "اختر القارئ" : "Select Reciter"}
-                    </p>
-                    <button onClick={() => setShowQariMenu(false)}>
-                      <X size={14} className="text-gray-400 hover:text-gray-700"/>
-                    </button>
+                    <p className="text-xs font-bold text-gray-700">{isAr ? "اختر القارئ" : "Select Reciter"}</p>
+                    <button onClick={() => setShowQariMenu(false)}><X size={14} className="text-gray-400 hover:text-gray-700"/></button>
                   </div>
                   {QARIS.map(q => (
                     <button
@@ -342,13 +389,12 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
               )}
             </div>
 
-            {/* Playback controls */}
+            {/* Controls */}
             <div className={`flex items-center gap-2 shrink-0 ${isAr ? "flex-row-reverse" : ""}`}>
               <button
                 onClick={() => playingAyah && playingAyah > 1 && play(playingAyah - 1)}
                 disabled={!playingAyah || playingAyah <= 1}
                 className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:opacity-30 transition"
-                title={isAr ? "الآية السابقة" : "Previous ayah"}
               >
                 {isAr ? <SkipForward size={15}/> : <SkipBack size={15}/>}
               </button>
@@ -363,13 +409,12 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                 onClick={() => playingAyah && playingAyah < arabic.numberOfAyahs && play(playingAyah + 1)}
                 disabled={!playingAyah || playingAyah >= arabic.numberOfAyahs}
                 className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:opacity-30 transition"
-                title={isAr ? "الآية التالية" : "Next ayah"}
               >
                 {isAr ? <SkipBack size={15}/> : <SkipForward size={15}/>}
               </button>
             </div>
 
-            {/* Now playing info */}
+            {/* Now playing */}
             <div className={`flex-1 min-w-0 ${isAr ? "text-right" : ""}`}>
               {playingAyah !== null ? (
                 <>
@@ -387,7 +432,6 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
               )}
             </div>
 
-            {/* Surah name */}
             <p className="font-arabic text-base text-gray-500 shrink-0 hidden sm:block leading-none">{arabic.name}</p>
           </div>
         </div>
