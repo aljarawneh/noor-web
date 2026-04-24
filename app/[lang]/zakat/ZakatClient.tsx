@@ -47,10 +47,10 @@ export default function ZakatClient({ lang }: { lang: Lang }) {
   ];
 
   const conditions = [
-    { key: "Nisab", desc: t(lang, "zakat.nisabCond") },
-    { key: "Haul", desc: t(lang, "zakat.haulCond") },
-    { key: "Rate", desc: t(lang, "zakat.rateCond") },
-    { key: t(lang, "zakat.intentionCond").split(" ")[0], desc: t(lang, "zakat.intentionCond") },
+    { key: isAr ? "النصاب" : "Nisab", desc: t(lang, "zakat.nisabCond") },
+    { key: isAr ? "الحول" : "Haul", desc: t(lang, "zakat.haulCond") },
+    { key: isAr ? "النسبة" : "Rate", desc: t(lang, "zakat.rateCond") },
+    { key: isAr ? "النية" : "Intention", desc: t(lang, "zakat.intentionCond") },
   ];
 
   return (
@@ -227,7 +227,7 @@ export default function ZakatClient({ lang }: { lang: Lang }) {
                     {currency} {fmt(zakatDue)}
                   </p>
                   <p className="text-xs opacity-70">
-                    2.5% of {currency} {fmt(totalAssets)}
+                    {isAr ? `٢.٥٪ من ${currency} ${fmt(totalAssets)}` : `2.5% of ${currency} ${fmt(totalAssets)}`}
                   </p>
                 </div>
               ) : (

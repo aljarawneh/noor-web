@@ -5,7 +5,7 @@ import "./globals.css";
 // ── Google AdSense publisher ID ──────────────────────────────────────────────
 // Replace with your real publisher ID from https://adsense.google.com
 // Format: ca-pub-XXXXXXXXXXXXXXXX
-const ADSENSE_PUB_ID = "ca-pub-XXXXXXXXXXXXXXXX";
+const ADSENSE_PUB_ID = "ca-pub-4613958392515337";
 // ────────────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
@@ -23,20 +23,21 @@ export const metadata: Metadata = {
     ],
     apple: "/favicon.svg",
   },
+  other: {
+    "google-adsense-account": ADSENSE_PUB_ID,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {ADSENSE_PUB_ID !== "ca-pub-XXXXXXXXXXXXXXXX" && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUB_ID}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUB_ID}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body suppressHydrationWarning>{children}</body>
     </html>

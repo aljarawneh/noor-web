@@ -6,13 +6,13 @@ import { type Lang, t } from "@/lib/translations";
 const PRAYER_KEYS = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
 type PrayerKey = (typeof PRAYER_KEYS)[number];
 
-const METHODS: Record<string, number> = {
-  "Muslim World League": 3,
-  "Egyptian General Authority": 5,
-  "Umm al-Qura (Mecca)": 4,
-  "Islamic Society of North America": 2,
-  "University of Islamic Sciences, Karachi": 1,
-};
+const METHODS: { key: string; labelEn: string; labelAr: string; id: number }[] = [
+  { key: "Muslim World League",                   labelEn: "Muslim World League",                   labelAr: "رابطة العالم الإسلامي",          id: 3 },
+  { key: "Egyptian General Authority",            labelEn: "Egyptian General Authority",            labelAr: "الهيئة المصرية العامة للمساحة",   id: 5 },
+  { key: "Umm al-Qura (Mecca)",                  labelEn: "Umm al-Qura (Mecca)",                  labelAr: "أم القرى — مكة المكرمة",           id: 4 },
+  { key: "Islamic Society of North America",      labelEn: "Islamic Society of North America",      labelAr: "الجمعية الإسلامية لأمريكا الشمالية", id: 2 },
+  { key: "University of Islamic Sciences, Karachi", labelEn: "University of Islamic Sciences, Karachi", labelAr: "جامعة العلوم الإسلامية — كراتشي", id: 1 },
+];
 
 const PRAYER_LABEL_KEYS: Record<PrayerKey, "prayer.fajr" | "prayer.sunrise" | "prayer.dhuhr" | "prayer.asr" | "prayer.maghrib" | "prayer.isha"> = {
   Fajr: "prayer.fajr",
@@ -30,7 +30,7 @@ export default function PrayerTimesClient({ lang }: { lang: Lang }) {
   const [city, setCity] = useState("");
   const [date, setDate] = useState("");
   const [hijri, setHijri] = useState("");
-  const [method, setMethod] = useState("Muslim World League");
+  const [method, setMethod] = useState(METHODS[0].key);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const isAr = lang === "ar";
@@ -42,7 +42,7 @@ export default function PrayerTimesClient({ lang }: { lang: Lang }) {
       const today = new Date();
       const d = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
       const res = await fetch(
-        `https://api.aladhan.com/v1/timings/${d}?latitude=${lat}&longitude=${lng}&method=${METHODS[method]}`
+        `https://api.aladhan.com/v1/timings/${d}?latitude=${lat}&longitude=${lng}&method=${METHODS.find(m => m.key === method)?.id ?? 3}`
       );
       const json = await res.json();
       setTimes(json.data.timings);
@@ -123,10 +123,10 @@ export default function PrayerTimesClient({ lang }: { lang: Lang }) {
           value={method}
           onChange={(e) => setMethod(e.target.value)}
           className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 bg-white"
-          dir="ltr"
+          dir={isAr ? "rtl" : "ltr"}
         >
-          {Object.keys(METHODS).map((m) => (
-            <option key={m}>{m}</option>
+          {METHODS.map((m) => (
+            <option key={m.key} value={m.key}>{isAr ? m.labelAr : m.labelEn}</option>
           ))}
         </select>
       </div>

@@ -41,10 +41,11 @@ export default async function LangLayout({
       />
       <div
         dir={isAr ? "rtl" : "ltr"}
-        className={`min-h-screen flex flex-col ${isAr ? "font-arabic" : ""}`}
+        lang={lang}
+        className="min-h-screen flex flex-col"
         style={{
           fontFamily: isAr
-            ? "'Amiri', 'Traditional Arabic', serif"
+            ? "'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', system-ui, sans-serif"
             : "'Segoe UI', system-ui, -apple-system, sans-serif",
         }}
       >
