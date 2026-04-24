@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
-  generateBuildId: async () => "v6-navbar-rtl",
+  generateBuildId: async () => "v7-redesign",
 };
 
 export default nextConfig;

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { type Lang } from "@/lib/translations";
+import { AudioProvider } from "@/lib/audioContext";
+import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 
 export async function generateStaticParams() {
   return [{ lang: "en" }, { lang: "ar" }];
@@ -39,20 +41,23 @@ export default async function LangLayout({
           __html: `document.documentElement.lang="${lang}";document.documentElement.dir="${isAr ? "rtl" : "ltr"}";`,
         }}
       />
-      <div
-        dir={isAr ? "rtl" : "ltr"}
-        lang={lang}
-        className="min-h-screen flex flex-col"
-        style={{
-          fontFamily: isAr
-            ? "'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', system-ui, sans-serif"
-            : "'Segoe UI', system-ui, -apple-system, sans-serif",
-        }}
-      >
-        <Navbar lang={lang} />
-        <main className="flex-1">{children}</main>
-        <Footer lang={lang} />
-      </div>
+      <AudioProvider>
+        <div
+          dir={isAr ? "rtl" : "ltr"}
+          lang={lang}
+          className="min-h-screen flex flex-col"
+          style={{
+            fontFamily: isAr
+              ? "'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', system-ui, sans-serif"
+              : "'Segoe UI', system-ui, -apple-system, sans-serif",
+          }}
+        >
+          <Navbar lang={lang} />
+          <main className="flex-1">{children}</main>
+          <GlobalAudioPlayer lang={lang} />
+          <Footer lang={lang} />
+        </div>
+      </AudioProvider>
     </>
   );
 }

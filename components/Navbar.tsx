@@ -21,6 +21,8 @@ export default function Navbar({ lang }: NavbarProps) {
     { href: `/${lang}`,              label: t(lang, "nav.home") },
     { href: `/${lang}/prayer-times`, label: t(lang, "nav.prayer") },
     { href: `/${lang}/quran`,        label: t(lang, "nav.quran") },
+    { href: `/${lang}/listen`,       label: isAr ? "استمع القرآن" : "Listen" },
+    { href: `/${lang}/kids`,         label: isAr ? "للأطفال" : "Kids" },
     { href: `/${lang}/zakat`,        label: t(lang, "nav.zakat") },
     { href: `/${lang}/finance`,      label: t(lang, "nav.finance") },
   ];

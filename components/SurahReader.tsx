@@ -1,21 +1,11 @@
 "use client";
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
-  Play, Pause, SkipForward, SkipBack,
-  ChevronLeft, ChevronRight, AlignLeft, BookOpen,
-  Headphones, X, BookMarked,
+  Play, Pause,
+  ChevronLeft, ChevronRight, AlignLeft, BookOpen, BookMarked,
 } from "lucide-react";
 import { type Lang } from "@/lib/translations";
-
-const QARIS = [
-  { id: "Alafasy_128kbps",               name: "Mishary Al-Afasy",   nameAr: "مشاري العفاسي" },
-  { id: "Husary_128kbps",                name: "Al-Husary",          nameAr: "محمود خليل الحصري" },
-  { id: "Abdul_Basit_Murattal_192kbps",  name: "Abdul Basit",        nameAr: "عبد الباسط عبد الصمد" },
-  { id: "AbdurRahman_As-Sudais_192kbps", name: "Al-Sudais",          nameAr: "عبدالرحمن السديس" },
-  { id: "Saad_Al-Ghamdi_128kbps",        name: "Saad Al-Ghamdi",    nameAr: "سعد الغامدي" },
-  { id: "Minshawi_Murattal_128kbps",     name: "Al-Minshawi",        nameAr: "محمد صديق المنشاوي" },
-  { id: "Mohammad_al_Tablawi_128kbps",   name: "Al-Tablawi",         nameAr: "محمد الطبلاوي" },
-];
+import { useAudio } from "@/lib/audioContext";
 
 export interface Ayah {
   number: number;
@@ -40,10 +30,6 @@ interface Props {
   lang: Lang;
 }
 
-function audioUrl(qari: string, surah: number, ayah: number) {
-  return `https://everyayah.com/data/${qari}/${String(surah).padStart(3,"0")}${String(ayah).padStart(3,"0")}.mp3`;
-}
-
 function mushafPageUrl(pageNum: number) {
   const p = String(pageNum).padStart(3, "0");
   return `https://raw.githubusercontent.com/quran/quran-images/master/media/jpg_medq/page${p}.jpg`;
@@ -56,14 +42,9 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
   const [mode, setMode] = useState<"text" | "mushaf">("text");
   const [imgError, setImgError] = useState(false);
 
-  // ── Audio ──
-  const [qari, setQari] = useState(QARIS[0].id);
-  const [playingAyah, setPlayingAyah] = useState<number | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [showQariMenu, setShowQariMenu] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const playingRef = useRef<number | null>(null);
-  useEffect(() => { playingRef.current = playingAyah; }, [playingAyah]);
+  // ── Global audio ──
+  const { nowPlaying, playing, playAyah: ctxPlay, togglePlay } = useAudio();
+  const playingAyah = nowPlaying?.surahNum === arabic.number ? nowPlaying.ayahNum : null;
 
   // ── Mushaf pages — group surah ayahs by Quran page number ──
   const pageGroups = useMemo(() => {
@@ -82,38 +63,25 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
   // Reset imgError on page change
   useEffect(() => { setImgError(false); }, [currentPageNum]);
 
-  const play = useCallback((n: number) => {
-    if (!audioRef.current) return;
-    audioRef.current.src = audioUrl(qari, arabic.number, n);
-    audioRef.current.load();
-    audioRef.current.play().catch(() => {});
-    setPlayingAyah(n);
-    setPlaying(true);
-  }, [qari, arabic.number]);
-
-  const handleEnded = useCallback(() => {
-    const cur = playingRef.current;
-    if (cur !== null && cur < arabic.numberOfAyahs) play(cur + 1);
-    else { setPlaying(false); setPlayingAyah(null); }
-  }, [arabic.numberOfAyahs, play]);
-
-  useEffect(() => {
-    if (playingRef.current !== null) play(playingRef.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qari]);
-
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (playing) audioRef.current.pause();
-    else if (playingAyah === null) play(1);
-    else audioRef.current.play().catch(() => {});
-  };
+  function handleAyahClick(ayahNum: number) {
+    if (playingAyah === ayahNum && playing) {
+      togglePlay();
+    } else {
+      ctxPlay({
+        surahNum: arabic.number,
+        surahName: arabic.name,
+        surahNameEn: arabic.englishName,
+        ayahNum,
+        totalAyahs: arabic.numberOfAyahs,
+      });
+    }
+  }
 
   return (
-    <div className="pb-28">
+    <div className="pb-10">
       {/* ── Mode toggle ── */}
       <div className={`flex gap-2 mb-6 ${isAr ? "flex-row-reverse" : ""}`}>
-        {(["text","mushaf"] as const).map(m => (
+        {(["text", "mushaf"] as const).map(m => (
           <button
             key={m}
             onClick={() => setMode(m)}
@@ -187,7 +155,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                   {isAr ? "الآيات والترجمة" : "Verses & Translation"}
                 </div>
               </div>
-              {currentAyahs.map((ayah, idx) => {
+              {currentAyahs.map((ayah) => {
                 const trans = translation?.ayahs.find(a => a.numberInSurah === ayah.numberInSurah);
                 const active = playingAyah === ayah.numberInSurah;
                 return (
@@ -196,10 +164,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                     className={`bg-white rounded-2xl p-4 border shadow-sm transition-all cursor-pointer ${
                       active ? "border-green-400 shadow-green-100 shadow-md" : "border-gray-100 hover:border-green-200"
                     }`}
-                    onClick={() => {
-                      if (active && playing) audioRef.current?.pause();
-                      else play(ayah.numberInSurah);
-                    }}
+                    onClick={() => handleAyahClick(ayah.numberInSurah)}
                   >
                     <div className={`flex items-center justify-between mb-3 ${isAr ? "flex-row-reverse" : ""}`}>
                       <div className={`flex items-center gap-2 ${isAr ? "flex-row-reverse" : ""}`}>
@@ -248,7 +213,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                 }}
               >
                 {/* Corner ornaments */}
-                {["top-1 left-1","top-1 right-1","bottom-1 left-1","bottom-1 right-1"].map(pos => (
+                {["top-1 left-1", "top-1 right-1", "bottom-1 left-1", "bottom-1 right-1"].map(pos => (
                   <div
                     key={pos}
                     className={`absolute ${pos} w-4 h-4 rounded-full z-10`}
@@ -365,10 +330,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
                     )}
                   </div>
                   <button
-                    onClick={() => {
-                      if (active && playing) audioRef.current?.pause();
-                      else play(ayah.numberInSurah);
-                    }}
+                    onClick={() => handleAyahClick(ayah.numberInSurah)}
                     className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                       active ? "text-white shadow" : "bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-700"
                     }`}
@@ -396,108 +358,6 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
           })}
         </div>
       )}
-
-      {/* Hidden audio */}
-      <audio
-        ref={audioRef}
-        onEnded={handleEnded}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        preload="none"
-      />
-
-      {/* ══════════ FIXED AUDIO BAR ══════════ */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white/96 backdrop-blur border-t border-gray-200"
-        style={{ boxShadow: "0 -4px 24px rgba(0,0,0,0.08)" }}
-      >
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className={`flex items-center gap-3 ${isAr ? "flex-row-reverse" : ""}`}>
-            {/* Qari selector */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => setShowQariMenu(v => !v)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition"
-              >
-                <Headphones size={13}/>
-                <span className="hidden sm:inline max-w-[90px] truncate">
-                  {(isAr
-                    ? QARIS.find(q => q.id === qari)?.nameAr
-                    : QARIS.find(q => q.id === qari)?.name
-                  )?.split(" ")[0]}
-                </span>
-              </button>
-              {showQariMenu && (
-                <div className={`absolute bottom-full mb-2 z-50 bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden w-60 ${isAr ? "right-0" : "left-0"}`}>
-                  <div className={`flex items-center justify-between px-4 py-3 border-b border-gray-100 ${isAr ? "flex-row-reverse" : ""}`}>
-                    <p className="text-xs font-bold text-gray-700">{isAr ? "اختر القارئ" : "Select Reciter"}</p>
-                    <button onClick={() => setShowQariMenu(false)}><X size={14} className="text-gray-400 hover:text-gray-700"/></button>
-                  </div>
-                  {QARIS.map(q => (
-                    <button
-                      key={q.id}
-                      onClick={() => { setQari(q.id); setShowQariMenu(false); }}
-                      className={`w-full px-4 py-3 text-sm hover:bg-green-50 transition flex items-center justify-between ${
-                        qari === q.id ? "bg-green-50 font-semibold" : "text-gray-700"
-                      } ${isAr ? "flex-row-reverse text-right" : "text-left"}`}
-                    >
-                      <span style={{ color: qari === q.id ? "#1B5E20" : undefined }}>
-                        {isAr ? q.nameAr : q.name}
-                      </span>
-                      {qari === q.id && <span style={{ color: "#1B5E20" }}>✓</span>}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Controls */}
-            <div className={`flex items-center gap-2 shrink-0 ${isAr ? "flex-row-reverse" : ""}`}>
-              <button
-                onClick={() => playingAyah && playingAyah > 1 && play(playingAyah - 1)}
-                disabled={!playingAyah || playingAyah <= 1}
-                className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:opacity-30 transition"
-              >
-                {isAr ? <SkipForward size={15}/> : <SkipBack size={15}/>}
-              </button>
-              <button
-                onClick={togglePlay}
-                className="w-11 h-11 rounded-full text-white flex items-center justify-center shadow-md hover:opacity-90 active:scale-95 transition"
-                style={{ background: "#1B5E20" }}
-              >
-                {playing ? <Pause size={18}/> : <Play size={18}/>}
-              </button>
-              <button
-                onClick={() => playingAyah && playingAyah < arabic.numberOfAyahs && play(playingAyah + 1)}
-                disabled={!playingAyah || playingAyah >= arabic.numberOfAyahs}
-                className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center disabled:opacity-30 transition"
-              >
-                {isAr ? <SkipBack size={15}/> : <SkipForward size={15}/>}
-              </button>
-            </div>
-
-            {/* Now playing */}
-            <div className={`flex-1 min-w-0 ${isAr ? "text-right" : ""}`}>
-              {playingAyah !== null ? (
-                <>
-                  <p className="text-xs font-semibold text-gray-800 truncate">
-                    {arabic.englishName} · {isAr ? `آية ${playingAyah}` : `Ayah ${playingAyah}`}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    {isAr ? QARIS.find(q=>q.id===qari)?.nameAr : QARIS.find(q=>q.id===qari)?.name}
-                  </p>
-                </>
-              ) : (
-                <p className="text-xs text-gray-400">
-                  {isAr ? "اضغط ▶ بجانب أي آية للاستماع" : "Press ▶ on any ayah to listen"}
-                </p>
-              )}
-            </div>
-
-            <p className="font-arabic text-base text-gray-500 shrink-0 hidden sm:block leading-none">{arabic.name}</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
