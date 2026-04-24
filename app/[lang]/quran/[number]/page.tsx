@@ -16,6 +16,12 @@ export async function generateStaticParams() {
   return params;
 }
 
+// Strip Arabic Extended-A annotation marks (U+08A0–U+08FF) — ruku, sajda,
+// pause signs — not rendered by any web font, causing □ boxes.
+function cleanArabic(text: string) {
+  return text.replace(/[\u08A0-\u08FF]/g, "").replace(/\s+/g, " ").trim();
+}
+
 async function fetchArabic(number: string): Promise<SurahData | null> {
   try {
     const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}`, {
@@ -23,7 +29,11 @@ async function fetchArabic(number: string): Promise<SurahData | null> {
     });
     if (!res.ok) return null;
     const json = await res.json();
-    return json.data ?? null;
+    const data = json.data ?? null;
+    if (data?.ayahs) {
+      data.ayahs = data.ayahs.map((a: { text: string }) => ({ ...a, text: cleanArabic(a.text) }));
+    }
+    return data;
   } catch { return null; }
 }
 
