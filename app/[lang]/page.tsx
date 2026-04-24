@@ -153,89 +153,85 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   return (
     <>
       {/* ── Hero ── */}
-      <section
-        className="relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #1B5E20 0%, #2E7D32 60%, #0D3B0F 100%)" }}
-      >
-        {/* Dot pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-        {/* Glow orb */}
-        <div
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle,#D4AF37,transparent)" }}
-        />
+      <section className="relative overflow-hidden bg-gray-950">
+        {/* Subtle green radial glow */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none"
+          style={{ background: "radial-gradient(circle,#2E7D32,transparent)" }} />
+        <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full opacity-10 blur-3xl pointer-events-none"
+          style={{ background: "radial-gradient(circle,#D4AF37,transparent)" }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-          <div className={`max-w-3xl ${isAr ? "ml-auto text-right" : ""}`}>
-            {/* Badge */}
-            <div
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-sm font-medium ${isAr ? "flex-row-reverse" : ""}`}
-              style={{
-                background: "rgba(255,255,255,0.12)",
-                color: "#F0D060",
-                border: "1px solid rgba(255,255,255,0.15)",
-              }}
-            >
-              <Star size={13} fill="#F0D060" />
-              {t(lang, "home.badge")}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className={`grid lg:grid-cols-2 gap-12 items-center ${isAr ? "lg:grid-flow-dense" : ""}`}>
+
+            {/* Left / content */}
+            <div className={isAr ? "lg:col-start-2 text-right" : ""}>
+              {/* Badge */}
+              <div
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 text-xs font-semibold ${isAr ? "flex-row-reverse" : ""}`}
+                style={{ background: "rgba(212,175,55,0.15)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.3)" }}
+              >
+                <Star size={11} fill="#D4AF37" />
+                {t(lang, "home.badge")}
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+                {t(lang, "home.heroTitle")}
+                <br />
+                <span style={{ color: "#4ade80" }}>{t(lang, "home.heroHighlight")}</span>
+              </h1>
+
+              <p className="text-xl font-arabic text-gray-400 mb-3 leading-loose">نور الإسلام</p>
+
+              <p className="text-base text-gray-400 mb-8 leading-relaxed max-w-lg">
+                {t(lang, "home.heroSubtitle")}
+              </p>
+
+              {/* CTAs */}
+              <div className={`flex flex-wrap gap-3 ${isAr ? "justify-end" : ""}`}>
+                <a href={IOS_URL} target="_blank" rel="noopener noreferrer"
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-gray-900 text-sm hover:opacity-90 transition-opacity ${isAr ? "flex-row-reverse" : ""}`}
+                  style={{ background: "#D4AF37" }}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.78M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                  {t(lang, "home.appStore")}
+                </a>
+                <a href={ANDROID_URL} target="_blank" rel="noopener noreferrer"
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white hover:opacity-90 transition-opacity ${isAr ? "flex-row-reverse" : ""}`}
+                  style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.36.6 1.24 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z"/>
+                  </svg>
+                  {t(lang, "home.googlePlay")}
+                </a>
+              </div>
             </div>
 
-            {/* Headline */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4">
-              {t(lang, "home.heroTitle")}
-              <br />
-              <span style={{ color: "#D4AF37" }}>{t(lang, "home.heroHighlight")}</span>
-            </h1>
-
-            <p className="text-2xl font-arabic text-green-200 mb-4 leading-loose">نور الإسلام</p>
-
-            <p className="text-lg text-green-100 mb-8 leading-relaxed max-w-xl">
-              {t(lang, "home.heroSubtitle")}
-            </p>
-
-            {/* CTA Buttons */}
-            <div className={`flex flex-wrap gap-4 mb-12 ${isAr ? "justify-end" : ""}`}>
-              <a
-                href={IOS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-gray-900 hover:scale-105 transition-transform ${isAr ? "flex-row-reverse" : ""}`}
-                style={{ background: "#D4AF37" }}
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.78M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-                {t(lang, "home.appStore")}
-              </a>
-              <a
-                href={ANDROID_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform ${isAr ? "flex-row-reverse" : ""}`}
-                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.25)" }}
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                  <path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.36.6 1.24 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8z"/>
-                </svg>
-                {t(lang, "home.googlePlay")}
-              </a>
-            </div>
-
-            {/* Stats row */}
-            <div className={`grid grid-cols-4 gap-4 max-w-lg ${isAr ? "ml-auto" : ""}`}>
-              {stats.map(s => (
-                <div key={s.labelKey} className="text-center">
-                  <p className="text-2xl font-bold text-white">{s.value}</p>
-                  <p className="text-green-300 text-xs mt-0.5">{t(lang, s.labelKey)}</p>
+            {/* Right / visual cards */}
+            <div className={`grid grid-cols-2 gap-3 ${isAr ? "lg:col-start-1" : ""}`}>
+              {stats.map((s, i) => (
+                <div key={s.labelKey}
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: i % 2 === 0 ? "rgba(27,94,32,0.4)" : "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(12px)",
+                  }}>
+                  <s.icon size={20} className="mb-3 opacity-60 text-green-400" />
+                  <p className="text-3xl font-bold text-white mb-1">{s.value}</p>
+                  <p className="text-gray-400 text-xs">{t(lang, s.labelKey)}</p>
                 </div>
               ))}
+              {/* Quran verse card spanning full width */}
+              <div className="col-span-2 rounded-2xl p-5 text-center"
+                style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)" }}>
+                <p className="font-arabic text-xl text-yellow-200 leading-loose mb-1">
+                  بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
+                </p>
+                <p className="text-gray-500 text-xs">In the name of Allah, the Most Gracious, the Most Merciful</p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
