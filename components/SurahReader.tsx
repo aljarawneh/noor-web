@@ -1,8 +1,8 @@
 "use client";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Play, Pause,
-  ChevronLeft, ChevronRight, AlignLeft, BookOpen, BookMarked,
+  ChevronLeft, ChevronRight, BookOpen, BookMarked,
 } from "lucide-react";
 import { type Lang } from "@/lib/translations";
 import { useAudio } from "@/lib/audioContext";
@@ -39,7 +39,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
   const isAr = lang === "ar";
 
   // ── View ──
-  const [mode, setMode] = useState<"text" | "mushaf">("text");
+  const mode = "mushaf";
   const [imgError, setImgError] = useState(false);
 
   // ── Global audio ──
@@ -79,30 +79,9 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
 
   return (
     <div className="pb-10">
-      {/* ── Mode toggle ── */}
-      <div className={`flex gap-2 mb-6 ${isAr ? "flex-row-reverse" : ""}`}>
-        {(["text", "mushaf"] as const).map(m => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
-              mode === m
-                ? "text-white border-transparent shadow-sm"
-                : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
-            }`}
-            style={mode === m ? { background: "#1B5E20" } : {}}
-          >
-            {m === "text" ? <AlignLeft size={15}/> : <BookOpen size={15}/>}
-            {m === "text"
-              ? (isAr ? "عرض النص" : "Text View")
-              : (isAr ? "عرض المصحف" : "Mushaf View")}
-          </button>
-        ))}
-      </div>
 
       {/* ══════════ MUSHAF VIEW ══════════ */}
-      {mode === "mushaf" && (
-        <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
           {/* ── Top navigation bar ── */}
           <div
             className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-white text-sm font-semibold"
@@ -296,68 +275,7 @@ export default function SurahReader({ arabic, translation, lang }: Props) {
               )}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ══════════ TEXT VIEW ══════════ */}
-      {mode === "text" && (
-        <div className="space-y-5">
-          {arabic.ayahs.map((ayah, idx) => {
-            const trans = translation?.ayahs[idx];
-            const active = playingAyah === ayah.numberInSurah;
-            return (
-              <div
-                key={ayah.number}
-                className={`bg-white rounded-2xl p-6 border shadow-sm transition-all duration-200 ${
-                  active ? "border-green-400 shadow-green-100 shadow-lg" : "border-gray-100"
-                }`}
-              >
-                <div className={`flex items-center justify-between mb-4 ${isAr ? "flex-row-reverse" : ""}`}>
-                  <div className={`flex items-center gap-2 ${isAr ? "flex-row-reverse" : ""}`}>
-                    <span
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                      style={{ background: "#F0FDF4", color: "#1B5E20" }}
-                    >
-                      {ayah.numberInSurah}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {isAr ? `آية ${ayah.numberInSurah}` : `Ayah ${ayah.numberInSurah}`}
-                    </span>
-                    {ayah.page && (
-                      <span className="text-xs text-gray-300 hidden sm:inline">
-                        · {isAr ? `ص${ayah.page}` : `p.${ayah.page}`}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleAyahClick(ayah.numberInSurah)}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                      active ? "text-white shadow" : "bg-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-700"
-                    }`}
-                    style={active ? { background: "#1B5E20" } : {}}
-                    title={isAr ? "استمع" : "Listen"}
-                  >
-                    {active && playing ? <Pause size={14}/> : <Play size={14}/>}
-                  </button>
-                </div>
-
-                <p className="font-quran text-3xl text-gray-900 leading-[2.4] mb-5 text-right" dir="rtl">
-                  {ayah.text}
-                </p>
-
-                {trans && (
-                  <div className={`border-t border-gray-100 pt-4 ${isAr ? "text-right" : ""}`}>
-                    <p className="text-xs text-gray-400 mb-1.5 font-medium uppercase tracking-wide">
-                      {isAr ? "الترجمة" : "Translation"}
-                    </p>
-                    <p className="text-gray-700 text-sm leading-relaxed" dir="ltr">{trans.text}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

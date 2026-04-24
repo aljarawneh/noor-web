@@ -124,33 +124,33 @@ export default async function SurahPage({
         </Link>
       </div>
 
-      {/* Surah header */}
+      {/* Surah header — compact */}
       <div
-        className="rounded-2xl p-8 mb-8 text-center text-white"
+        className="rounded-2xl px-6 py-4 mb-6 text-white"
         style={{ background: "linear-gradient(135deg, #1B5E20, #2E7D32)" }}
       >
-        <div className={`flex items-center justify-center gap-3 mb-3 ${isAr ? "flex-row-reverse" : ""}`}>
-          <span className="text-green-200 text-sm">
-            {isMeccan ? t(lang, "quran.meccan") : t(lang, "quran.medinan")}
-          </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-green-300"/>
-          <span className="text-green-200 text-sm">
-            {arabic.numberOfAyahs} {t(lang, "quran.verses")}
-          </span>
+        <div className={`flex items-center justify-between ${isAr ? "flex-row-reverse" : ""}`}>
+          <div className={isAr ? "text-right" : ""}>
+            <h1 className="text-3xl font-quran leading-snug">{arabic.name}</h1>
+            {!isAr && (
+              <p className="text-green-200 text-sm">{arabic.englishName} · {arabic.englishNameTranslation}</p>
+            )}
+          </div>
+          <div className={`flex flex-col items-end gap-1 shrink-0 ${isAr ? "items-start" : ""}`}>
+            <span className="text-xs text-green-200 font-semibold px-2 py-0.5 rounded-full bg-white/15">
+              {isMeccan ? t(lang, "quran.meccan") : t(lang, "quran.medinan")}
+            </span>
+            <span className="text-sm font-bold text-white">
+              {arabic.numberOfAyahs} {t(lang, "quran.verses")}
+            </span>
+          </div>
         </div>
-        <h1 className="text-5xl font-quran mb-2 leading-loose">{arabic.name}</h1>
-        <p className="text-xl font-bold text-green-100">
-          {arabic.number}. {isAr ? arabic.name : arabic.englishName}
-        </p>
-        {!isAr && (
-          <p className="text-green-200 text-sm mt-1 italic">{arabic.englishNameTranslation}</p>
-        )}
-
         {arabic.number !== 9 && (
-          <p className="mt-6 text-2xl font-quran text-yellow-200 leading-loose">
+          <p className="mt-3 text-lg font-quran text-yellow-200 leading-loose">
             بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
           </p>
         )}
+
       </div>
 
       {/* Interactive reader (text + mushaf + audio) */}
