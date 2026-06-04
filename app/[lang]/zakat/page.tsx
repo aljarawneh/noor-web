@@ -23,10 +23,10 @@ export async function generateMetadata({
     description,
     keywords: t(lang, "zakat.metaKeywords"),
     alternates: {
-      canonical: `https://noorislam.app/${lang}/zakat`,
+      canonical: `https://nooralisam.com/${lang}/zakat`,
       languages: {
-        en: "https://noorislam.app/en/zakat",
-        ar: "https://noorislam.app/ar/zakat",
+        en: "https://nooralisam.com/en/zakat",
+        ar: "https://nooralisam.com/ar/zakat",
       },
     },
     openGraph: {
@@ -35,7 +35,7 @@ export async function generateMetadata({
       type: "website",
       locale: isAr ? "ar_SA" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_SA",
-      url: `https://noorislam.app/${lang}/zakat`,
+      url: `https://nooralisam.com/${lang}/zakat`,
     },
     twitter: { card: "summary_large_image", title, description },
   };

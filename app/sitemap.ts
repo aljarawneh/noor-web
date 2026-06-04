@@ -2,13 +2,15 @@ import type { MetadataRoute } from "next";
 
 export const dynamic = "force-static";
 
-const BASE_URL = "https://noorislam.app";
+const BASE_URL = "https://nooralisam.com";
 const LANGS = ["en", "ar"] as const;
 
 const STATIC_PAGES = [
   { path: "", priority: 1.0, changeFrequency: "weekly" as const },
   { path: "/prayer-times", priority: 0.9, changeFrequency: "daily" as const },
   { path: "/quran", priority: 0.9, changeFrequency: "weekly" as const },
+  { path: "/listen", priority: 0.8, changeFrequency: "weekly" as const },
+  { path: "/kids", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/zakat", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/finance", priority: 0.7, changeFrequency: "monthly" as const },
 ];

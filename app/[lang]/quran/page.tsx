@@ -159,20 +159,22 @@ export async function generateMetadata({
   const lang = toLang(rawLang);
   const isAr = lang === "ar";
   const title = isAr
-    ? "القرآن الكريم — اقرأ جميع السور | نور الإسلام"
-    : "Read the Holy Quran Online — All 114 Surahs | Noor Al Islam";
+    ? "قراءة القرآن الكريم أونلاين | جميع السور مع النص العربي والترجمة | نور الإسلام"
+    : "Read Quran Online Free — All 114 Surahs with Arabic Text & Translation | Noor Al Islam";
   const description = isAr
-    ? "اقرأ القرآن الكريم أونلاين بالنص العربي والترجمة. جميع السور الـ 114 مع عدد الآيات والنوع."
-    : "Read the Holy Quran online with Arabic text and English translation. Browse all 114 surahs with verse count and revelation type.";
+    ? "اقرأ القرآن الكريم كاملاً أونلاين مجاناً. جميع السور الـ114 مع النص العربي والترجمة الإنجليزية وصور المصحف. لا يلزم تحميل."
+    : "Read the complete Holy Quran online for free. All 114 surahs with Arabic text, English translation, and mushaf page images. No download required.";
   return {
     title,
     description,
-    keywords: t(lang, "quran.metaKeywords"),
+    keywords: isAr
+      ? "قراءة القرآن, القرآن الكريم, قرآن أونلاين, قراءة القرآن أونلاين, سور القرآن, القرآن بالعربية, تفسير القرآن, تلاوة القرآن, مصحف"
+      : "read quran online, quran online, holy quran, quran with translation, quran in arabic, surah, quran english, free quran, quran text, full quran",
     alternates: {
-      canonical: `https://noorislam.app/${lang}/quran`,
+      canonical: `https://nooralisam.com/${lang}/quran`,
       languages: {
-        en: "https://noorislam.app/en/quran",
-        ar: "https://noorislam.app/ar/quran",
+        en: "https://nooralisam.com/en/quran",
+        ar: "https://nooralisam.com/ar/quran",
       },
     },
     openGraph: {
@@ -181,7 +183,7 @@ export async function generateMetadata({
       type: "website",
       locale: isAr ? "ar_SA" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_SA",
-      url: `https://noorislam.app/${lang}/quran`,
+      url: `https://nooralisam.com/${lang}/quran`,
     },
     twitter: { card: "summary_large_image", title, description },
   };
@@ -192,6 +194,17 @@ export default async function QuranPage({ params }: { params: Promise<{ lang: st
   const lang = toLang(rawLang);
   const isAr = lang === "ar";
   const surahs = await fetchSurahs();
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "How many surahs are in the Quran?", "acceptedAnswer": {"@type": "Answer", "text": "The Holy Quran contains 114 surahs (chapters), ranging from the longest Surah Al-Baqarah (286 verses) to the shortest surahs like Al-Kawthar (3 verses). The Quran has 6,236 verses in total."}},
+      {"@type": "Question", "name": "What is the first surah in the Quran?", "acceptedAnswer": {"@type": "Answer", "text": "The first surah in the Quran is Al-Fatiha (The Opening), which consists of 7 verses. It is recited in every unit of the Islamic prayer (Salah) and is considered the essence of the Quran."}},
+      {"@type": "Question", "name": "Can I read the Quran online for free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! Noor Al Islam provides the complete Holy Quran online for free — all 114 surahs with Arabic text, English translation, and authentic mushaf page images. No account or download required."}},
+      {"@type": "Question", "name": "كم عدد سور القرآن الكريم؟", "acceptedAnswer": {"@type": "Answer", "text": "يحتوي القرآن الكريم على 114 سورة و6236 آية. أطول سورة هي البقرة بـ286 آية، وأقصر السور كالكوثر بـ3 آيات."}}
+    ]
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -219,6 +232,10 @@ export default async function QuranPage({ params }: { params: Promise<{ lang: st
       </div>
 
       <QuranListClient surahs={surahs} lang={lang} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     </div>
   );
 }

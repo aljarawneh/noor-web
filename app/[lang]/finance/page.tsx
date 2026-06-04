@@ -24,10 +24,10 @@ export async function generateMetadata({
     description,
     keywords: t(lang, "finance.metaKeywords"),
     alternates: {
-      canonical: `https://noorislam.app/${lang}/finance`,
+      canonical: `https://nooralisam.com/${lang}/finance`,
       languages: {
-        en: "https://noorislam.app/en/finance",
-        ar: "https://noorislam.app/ar/finance",
+        en: "https://nooralisam.com/en/finance",
+        ar: "https://nooralisam.com/ar/finance",
       },
     },
     openGraph: {
@@ -36,7 +36,7 @@ export async function generateMetadata({
       type: "website",
       locale: isAr ? "ar_SA" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_SA",
-      url: `https://noorislam.app/${lang}/finance`,
+      url: `https://nooralisam.com/${lang}/finance`,
     },
     twitter: { card: "summary_large_image", title, description },
   };

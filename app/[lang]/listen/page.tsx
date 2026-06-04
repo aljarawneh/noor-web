@@ -17,19 +17,22 @@ export async function generateMetadata({
   const lang = toLang(rawLang);
   const isAr = lang === "ar";
   const title = isAr
-    ? "استمع إلى القرآن الكريم — جميع السور | نور الإسلام"
-    : "Listen to the Holy Quran — All 114 Surahs | Noor Al Islam";
+    ? "استماع القرآن الكريم | مشاري العفاسي عبد الباسط السديس والمزيد | نور الإسلام"
+    : "Listen to Quran Online Free — Mishary Alafasy, Abdul Basit, Al-Sudais | Noor Al Islam";
   const description = isAr
-    ? "استمع إلى القرآن الكريم بصوت كبار القراء مثل مشاري العفاسي والحصري وعبد الباسط. جميع السور الـ 114 مجاناً."
-    : "Listen to the Holy Quran recited by world-class reciters including Mishary Al-Afasy, Al-Husary, and Abdul Basit. All 114 surahs, free.";
+    ? "استمع إلى القرآن الكريم أونلاين مجاناً بأصوات كبار القراء. جميع السور الـ114 بصوت مشاري العفاسي وعبد الباسط والسديس والحصري والمزيد."
+    : "Listen to the Holy Quran online free with world-class reciters. Stream all 114 surahs by Mishary Alafasy, Abdul Basit, Al-Sudais, Al-Husary and more. No account needed.";
   return {
     title,
     description,
+    keywords: isAr
+      ? "استماع القرآن, سماع القرآن, تلاوة القرآن, مشاري العفاسي, عبد الباسط عبد الصمد, عبدالرحمن السديس, القرآن صوت, قرآن mp3, سماع سور"
+      : "listen quran online, quran audio, quran recitation, mishary alafasy, abdul basit, al sudais, quran mp3, quran streaming, listen surah, quran free",
     alternates: {
-      canonical: `https://noorislam.app/${lang}/listen`,
+      canonical: `https://nooralisam.com/${lang}/listen`,
       languages: {
-        en: "https://noorislam.app/en/listen",
-        ar: "https://noorislam.app/ar/listen",
+        en: "https://nooralisam.com/en/listen",
+        ar: "https://nooralisam.com/ar/listen",
       },
     },
     openGraph: { title, description, type: "website" },

@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function ListenClient({ surahs, lang }: Props) {
-  const { nowPlaying, playing, qari, setQari, playAyah } = useAudio();
+  const { nowPlaying, playing, qari, setQari, playAyah, togglePlay, stop } = useAudio();
   const [search, setSearch] = useState("");
   const [showQariMenu, setShowQariMenu] = useState(false);
   const isAr = lang === "ar";
@@ -25,8 +25,10 @@ export default function ListenClient({ surahs, lang }: Props) {
   const qariInfo = QARIS.find(q => q.id === qari);
 
   function handlePlay(surah: Surah) {
-    const isCurrentlyPlaying = nowPlaying?.surahNum === surah.number;
-    if (isCurrentlyPlaying) return;
+    if (nowPlaying?.surahNum === surah.number) {
+      stop();
+      return;
+    }
     playAyah({
       surahNum: surah.number,
       surahName: surah.name,
@@ -137,7 +139,7 @@ export default function ListenClient({ surahs, lang }: Props) {
               >
                 {isActive ? <Pause size={12}/> : <Play size={12}/>}
                 {isActive
-                  ? (isAr ? "يعزف" : "Playing")
+                  ? (isAr ? "إيقاف" : "Stop")
                   : (isAr ? "استمع" : "Listen")}
               </button>
             </div>

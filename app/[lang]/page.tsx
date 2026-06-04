@@ -20,17 +20,17 @@ export async function generateMetadata({
   const isAr = lang === "ar";
   return {
     title: isAr
-      ? "نور الإسلام — رفيقك الإسلامي الشامل"
-      : "Noor Al Islam — Your Complete Islamic Companion",
+      ? "نور الإسلام — أوقات الصلاة، القرآن الكريم، الزكاة والأذكار"
+      : "Noor Al Islam — Prayer Times, Quran, Zakat Calculator & Islamic App",
     description: isAr
-      ? "أوقات الصلاة، القرآن الكريم، حاسبة الزكاة، الاستثمار الحلال، الأذكار والمزيد — كل شيء في مكان واحد."
-      : "Prayer times, Quran reader, Zakat calculator, Halal investing, Adhkar and more — all in one place, free.",
+      ? "تطبيق إسلامي شامل: أوقات الصلاة بالموقع، قراءة واستماع القرآن الكريم بأصوات كبار القراء، حاسبة الزكاة، الاستثمار الحلال، الأذكار والأدعية — مجاناً."
+      : "Complete Islamic app: Accurate prayer times by GPS, Quran reader with audio recitation, Zakat calculator, Halal finance screener, daily Adhkar — 100% free.",
     keywords: isAr
-      ? "نور الإسلام, أوقات الصلاة, القرآن, حاسبة الزكاة, استثمار حلال, أذكار, مسلم"
-      : "noor al islam, islamic app, prayer times, quran, zakat calculator, halal investing, adhkar, muslim",
+      ? "نور الإسلام, أوقات الصلاة, القرآن الكريم, استماع القرآن, حاسبة الزكاة, استثمار حلال, أذكار, أدعية, اتجاه القبلة, صلاة, رمضان, مسلم, إسلام, تطبيق إسلامي"
+      : "noor al islam, islamic app, prayer times, quran reader, listen quran, zakat calculator, halal investing, adhkar, qibla direction, muslim app, islamic companion, free quran, prayer schedule",
     alternates: {
-      canonical: `https://noorislam.app/${lang}`,
-      languages: { en: "https://noorislam.app/en", ar: "https://noorislam.app/ar" },
+      canonical: `https://nooralisam.com/${lang}`,
+      languages: { en: "https://nooralisam.com/en", ar: "https://nooralisam.com/ar" },
     },
     openGraph: {
       title: "Noor Al Islam — نور الإسلام",
@@ -38,7 +38,7 @@ export async function generateMetadata({
       type: "website",
       locale: isAr ? "ar_SA" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_SA",
-      url: `https://noorislam.app/${lang}`,
+      url: `https://nooralisam.com/${lang}`,
     },
     twitter: { card: "summary_large_image", title: "Noor Al Islam", description: "Your complete Islamic companion." },
   };
@@ -129,9 +129,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
   const stats = [
     { value: "50K+", labelKey: "home.stat.users" as const, icon: Users },
-    { value: "114", labelKey: "home.stat.surahs" as const, icon: BookOpen },
-    { value: "5", labelKey: "home.stat.prayers" as const, icon: Clock },
-    { value: "4.8★", labelKey: "home.stat.rating" as const, icon: Star },
+    { value: "4.9★", labelKey: "home.stat.rating" as const, icon: Star },
   ];
 
   const quickLinks = [

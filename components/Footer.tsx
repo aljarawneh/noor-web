@@ -74,19 +74,29 @@ export default function Footer({ lang }: FooterProps) {
             <h4 className="text-white font-semibold mb-4">{t(lang, "footer.about")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href={`/${lang}/about`} className="hover:text-white transition-colors">
+                  {lang === "ar" ? "عن التطبيق" : "About"}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${lang}/blog`} className="hover:text-white transition-colors">
+                  {lang === "ar" ? "المدونة" : "Blog"}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${lang}/privacy`} className="hover:text-white transition-colors">
                   {t(lang, "footer.privacy")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href={`/${lang}/terms`} className="hover:text-white transition-colors">
                   {t(lang, "footer.terms")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link href={`/${lang}/contact`} className="hover:text-white transition-colors">
                   {t(lang, "footer.contact")}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

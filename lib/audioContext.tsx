@@ -5,10 +5,10 @@ export const QARIS = [
   { id: "Alafasy_128kbps", name: "Mishary Al-Afasy", nameAr: "مشاري العفاسي" },
   { id: "Husary_128kbps", name: "Al-Husary", nameAr: "محمود خليل الحصري" },
   { id: "Abdul_Basit_Murattal_192kbps", name: "Abdul Basit", nameAr: "عبد الباسط عبد الصمد" },
-  { id: "AbdurRahman_As-Sudais_192kbps", name: "Al-Sudais", nameAr: "عبدالرحمن السديس" },
-  { id: "Saad_Al-Ghamdi_128kbps", name: "Saad Al-Ghamdi", nameAr: "سعد الغامدي" },
-  { id: "Minshawi_Murattal_128kbps", name: "Al-Minshawi", nameAr: "محمد صديق المنشاوي" },
-  { id: "Mohammad_al_Tablawi_128kbps", name: "Al-Tablawi", nameAr: "محمد الطبلاوي" },
+  { id: "Abdurrahmaan_As-Sudais_192kbps", name: "Al-Sudais", nameAr: "عبدالرحمن السديس" },
+  { id: "Ghamadi_40kbps", name: "Saad Al-Ghamdi", nameAr: "سعد الغامدي" },
+  { id: "Minshawy_Murattal_128kbps", name: "Al-Minshawy", nameAr: "محمد صديق المنشاوي" },
+  { id: "Mohammad_al_Tablaway_128kbps", name: "Al-Tablawi", nameAr: "محمد الطبلاوي" },
 ];
 
 export type NowPlaying = {

@@ -76,10 +76,10 @@ export async function generateMetadata({
       ? `سورة ${arabicName}, قرآن, استماع قرآن, ${arabicName} أونلاين`
       : `surah ${englishName.toLowerCase()}, quran ${number}, listen quran, quran translation`,
     alternates: {
-      canonical: `https://noorislam.app/${lang}/quran/${number}`,
+      canonical: `https://nooralisam.com/${lang}/quran/${number}`,
       languages: {
-        en: `https://noorislam.app/en/quran/${number}`,
-        ar: `https://noorislam.app/ar/quran/${number}`,
+        en: `https://nooralisam.com/en/quran/${number}`,
+        ar: `https://nooralisam.com/ar/quran/${number}`,
       },
     },
     openGraph: {
@@ -87,7 +87,7 @@ export async function generateMetadata({
       type: "article",
       locale: isAr ? "ar_SA" : "en_US",
       alternateLocale: isAr ? "en_US" : "ar_SA",
-      url: `https://noorislam.app/${lang}/quran/${number}`,
+      url: `https://nooralisam.com/${lang}/quran/${number}`,
     },
     twitter: { card: "summary_large_image", title, description },
   };

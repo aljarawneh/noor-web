@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 // Replace PUBLISHER_ID and SLOT_ID with your real values from Google AdSense
 // Publisher ID format: ca-pub-XXXXXXXXXXXXXXXX
 // Slot ID: the 10-digit number from your ad unit
-const PUBLISHER_ID = "ca-pub-XXXXXXXXXXXXXXXX";
+const PUBLISHER_ID = "ca-pub-4613958392515337";
 
 interface Props {
   slot: string;
@@ -28,8 +28,6 @@ export default function AdUnit({ slot, format = "auto", className = "" }: Props)
       pushed.current = true;
     } catch { /* ads blocked or not loaded */ }
   }, []);
-
-  if (PUBLISHER_ID === "ca-pub-XXXXXXXXXXXXXXXX") return null; // Hide until configured
 
   return (
     <div className={`overflow-hidden ${className}`}>

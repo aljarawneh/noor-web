@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://noorislam.app/sitemap.xml",
+    sitemap: "https://nooralisam.com/sitemap.xml",
   };
 }
